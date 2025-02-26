@@ -24,7 +24,7 @@ class HelloCodePipelineServiceImplTest {
     void testEnvironment() {
         ReflectionTestUtils.setField(service, "environment", "prod");
         String result = service.environment();
-        assertEquals("production", result);
+        assertEquals("producion", result);
     }
 
 }
