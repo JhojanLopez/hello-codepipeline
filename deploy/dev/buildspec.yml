@@ -15,7 +15,7 @@ phases:
   build:
     commands:
       - echo "Construyendo la aplicación..."
-      - ./gradlew clean jar  # Compila el código y genera el JAR
+      - ./gradlew clean bootJar  # Compila el código y genera el JAR
       - echo "Ejecutando pruebas..."
       - ./gradlew test  # Ejecuta pruebas unitarias
 
@@ -23,11 +23,23 @@ phases:
     commands:
       - echo "Build finalizado. Generando artefactos..."
       - cp build/libs/*.jar app.jar  # Copia el JAR final para su despliegue
+      - echo "Copiando scripts, configuraciones y variables de entorno..."
+      - mkdir -p scripts config envs  # Asegura que los directorios existan
+      - cp -r scripts/* scripts/  # Copia los scripts
+      - cp -r config/* config/    # Copia la configuración
+      - cp -r envs/* envs/  # Copia las variables de entorno
+      - echo "Exportando variables de entorno..."
+      - export $(grep -v '^#' envs/.env | xargs)  # Carga las variables en el entorno actual
 
+
+# is required setting a role to allow to interact on AMAZON S3
 artifacts:
   files:
     - app.jar
-  discard-paths: yes
+    - scripts/**/*  # Include the scripts directory in the artifact.
+    - config/**/*
+    - envs/**/*
+  discard-paths: no
 
 reports:
   test-reports:
@@ -35,7 +47,7 @@ reports:
       - build/test-results/test/*.xml
     base-directory: build/
     file-format: JUNITXML
-# to allow putting logs on S3 is required setting bucket permissions as well as has a role on CodeBuild that can write on the bucket assigned.
+# to allow putting logs on S3 is required setting bucket permissions (depending who uses the bucket (optional)) as well as has a role on CodeBuild that can write on the bucket assigned.
 #logs:
 #  cloudWatchLogs:
 #    status: ENABLED

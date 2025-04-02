@@ -36,7 +36,12 @@ tasks.named('test') {
 }
 
 jar {
-    archiveBaseName.set("hello-codepipeline")  // Nombre base del JAR
-    archiveVersion.set("1.0.0")           // Versión del JAR
-    archiveClassifier.set("")             // Remueve el sufijo "-plain" si existe
+    enabled = false
+}
+
+// Configura la tarea `bootJar` para generar un fat JAR.
+bootJar {
+    archiveBaseName.set("hello-codepipeline")  // Nombre base del JAR.
+    archiveVersion.set("1.0.0")               // Versión del JAR.
+    archiveClassifier.set("")                 // Remueve el sufijo "-plain" si existe.
 }
