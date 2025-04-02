@@ -1,3 +1,10 @@
 spring:
   application:
     name: hello-codepipeline-dev
+#Open api configs
+springdoc:
+  swagger-ui:
+    enabled: true
+  packages-to-scan: com.example.hellocodepipeline.controllers
+  api-docs:
+    enabled: true
