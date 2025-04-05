@@ -50,7 +50,8 @@ hooks:
     - location: scripts/start_server.sh         # Script to start the server.
       timeout: 600                              # Maximum execution time in seconds.
       runas: ec2-user
-
+      env:
+        SPRING_PROFILES_ACTIVE: dev  #you can indicate envs here.
   # "ApplicationStop" phase: Runs before stopping the application (useful for blue/green deployments).
   ApplicationStop:
     - location: scripts/stop_server.sh          # Script to stop the server.
