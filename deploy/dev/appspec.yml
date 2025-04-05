@@ -1,0 +1,58 @@
+# Version of the file format. Currently, the most common version is 0.0.
+version: 0.0
+
+# Operating system of the target servers. In this case, it's Linux.
+os: linux
+
+# "files" section: Defines which files to copy and where to copy them.
+files:
+  - source: /app.jar          # The JAR file generated in the build.
+    destination: /home/ec2-user/app  # Destination path on the EC2 instance.
+    overwrite: true           # Overwrites the file if it already exists.
+  - source: config
+    destination: /home/ec2-user/app/config
+    overwrite: true
+  - source: envs
+    destination: /home/ec2-user/app/envs
+    overwrite: true
+  - source: scripts  # Copia toda la carpeta scripts
+    destination: /home/ec2-user/app/scripts
+    overwrite: true
+
+
+# "permissions" section: Defines file permissions (optional).
+permissions:
+  - object: /home/ec2-user/app/app.jar  # Path of the JAR file on the instance.
+    owner: ec2-user          # Owner of the file.
+    group: ec2-user          # Group of the file.
+    mode: 755                # Permissions in octal format (rwxr-xr-x).
+  - object: /home/ec2-user/app/scripts/*
+    owner: ec2-user
+    group: ec2-user
+    mode: 755
+
+# "hooks" section: Defines scripts or commands to run during different deployment phases.
+hooks:
+  # "BeforeInstall" phase: Runs before copying files.
+  BeforeInstall:
+    - location: /home/ec2-user/app/scripts/stop_server.sh  # Stops the server if it's already running.
+      timeout: 300                      # Maximum execution time in seconds.
+      runas: ec2-user                   # User to run the script as.
+
+  # "AfterInstall" phase: Runs after copying files.
+#  AfterInstall:
+#    - location: /home/ec2-user/app/scripts/install_dependencies.sh  # Installs dependencies if needed.
+#      timeout: 300
+#      runas: ec2-user
+
+  # "ApplicationStart" phase: Runs after starting the application.
+  ApplicationStart:
+    - location: /home/ec2-user/app/scripts/start_server.sh  # Starts the server with the new JAR.
+      timeout: 600
+      runas: ec2-user
+
+  # "ValidateService" phase: Runs to verify that the application has been deployed successfully.
+#  ValidateService:
+#    - location: /home/ec2-user/app/scripts/verify_deployment.sh  # Verifies that the server is running.
+#      timeout: 300
+#      runas: ec2-user
