@@ -28,6 +28,8 @@ phases:
       - cp -r scripts/* scripts/  # Copia los scripts
       - cp -r config/* config/    # Copia la configuración
       - cp -r envs/* envs/  # Copia las variables de entorno
+      - echo "Copiando appspec.yml a la raíz..."
+      - cp deploy/dev/appspec.yml .
       - echo "Exportando variables de entorno..."
       - export $(grep -v '^#' envs/.env | xargs)  # Carga las variables en el entorno actual
 
@@ -36,6 +38,7 @@ phases:
 artifacts:
   files:
     - app.jar
+    - appspec.yml
     - scripts/**/*  # Include the scripts directory in the artifact.
     - config/**/*
     - envs/**/*
