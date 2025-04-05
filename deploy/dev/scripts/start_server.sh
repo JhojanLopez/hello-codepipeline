@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #loading environment variables
-source "/home/jhojan/projects/aws/hello-codepipeline/deploy/dev/envs/.env" #used developing
-#source "/home/ec2-user/app/envs/.env"
+#source "/home/jhojan/projects/aws/hello-codepipeline/deploy/dev/envs/.env" #used developing
+source "/home/ec2-user/app/envs/.env" #used EC2
 # define variables
 APP_DIR=${APP_DIR}
 JAR_FILE=${JAR_FILE}
