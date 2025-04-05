@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Cargar las variables de entorno desde .env
-source "/home/jhojan/projects/aws/hello-codepipeline/deploy/dev/envs/.env" #used developing
-#source "/home/ec2-user/app/envs/.env"
+#source "/home/jhojan/projects/aws/hello-codepipeline/deploy/dev/envs/.env" #used developing
+source "/home/ec2-user/app/envs/.env" #used EC2
 
 # Buscar el proceso del JAR que está corriendo
 PROCESS_ID=$(pgrep -f "$JAR_FILE")
