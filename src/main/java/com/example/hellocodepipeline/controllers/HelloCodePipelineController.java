@@ -21,7 +21,7 @@ public class HelloCodePipelineController {
         try {
             return ResponseEntity.ok(service.greeting(name));
         } catch (Exception e) {
-            log.error("There was an error in the controller method greeting"+ e.getMessage());
+            log.error("There was an error in the controller (greeting(@PathVariable String name)) "+ e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -31,7 +31,7 @@ public class HelloCodePipelineController {
         try {
             return ResponseEntity.ok("App is running in the environment " + service.environment());
         } catch (Exception e) {
-            log.error("There was an error in the controller method greeting"+ e.getMessage());
+            log.error("There was an error in the controller (getEnvironment()) "+ e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

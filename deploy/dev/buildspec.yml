@@ -1,0 +1,61 @@
+#this file indicates how codebuild must compile our code.
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17  # java version
+
+  pre_build:
+    commands:
+      - echo "Verificando dependencias..."
+      - chmod +x gradlew  # Asegura permisos de ejecución
+      - ./gradlew dependencies  # Descarga dependencias
+
+  build:
+    commands:
+      - echo "Construyendo la aplicación..."
+      - ./gradlew clean bootJar  # Compila el código y genera el JAR
+      - echo "Ejecutando pruebas..."
+      - ./gradlew test  # Ejecuta pruebas unitarias
+
+  post_build:
+    commands:
+      - echo "Build finalizado. Generando artefactos..."
+      - cp build/libs/*.jar app.jar
+      - echo "Copiando scripts, configuraciones y variables de entorno..."
+      - echo "Contenido en deploy/dev/scripts"
+      - ls -l deploy/dev/scripts
+      - cp -r deploy/dev/scripts ./scripts
+      - cp -r deploy/dev/config ./config
+      - cp -r deploy/dev/envs ./envs
+      - echo "Copiando appspec.yml a la raíz..."
+      - cp deploy/dev/appspec.yml .
+      - echo "Exportando variables de entorno..."
+      - export $(grep -v '^#' envs/.env | xargs)
+
+
+
+# is required setting a role to allow to interact on AMAZON S3
+artifacts:
+  files:
+    - app.jar
+    - appspec.yml
+    - scripts/**/*  # Include the scripts directory in the artifact.
+    - config/**/*
+    - envs/**/*
+  discard-paths: no
+
+reports:
+  test-reports:
+    files:
+      - build/test-results/test/*.xml
+    base-directory: build/
+    file-format: JUNITXML
+# to allow putting logs on S3 is required setting bucket permissions (depending who uses the bucket (optional)) as well as has a role on CodeBuild that can write on the bucket assigned.
+#logs:
+#  cloudWatchLogs:
+#    status: ENABLED
+#  s3Logs:
+#    status: ENABLED
+#    location: my-log-bucket/logs/

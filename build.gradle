@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -33,4 +34,15 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jar {
+    enabled = false
+}
+
+// Configura la tarea `bootJar` para generar un fat JAR.
+bootJar {
+    archiveBaseName.set("hello-codepipeline")  // Nombre base del JAR.
+    archiveVersion.set("1.0.0")               // Versión del JAR.
+    archiveClassifier.set("")                 // Remueve el sufijo "-plain" si existe.
 }

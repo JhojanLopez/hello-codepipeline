@@ -1,0 +1,85 @@
+#this file indicates how your app is deployed. during the process of deploy CodeDeploy read this file.
+#it can be on S3 or on the root of your project.
+
+# Version of the file format. Currently, the most common version is 0.0.
+version: 0.0
+
+# Operating system of the target servers. Can be "linux" or "windows".
+os: linux
+
+# "files" section: Defines which files or directories to copy and where to copy them.
+files:
+  - source: /my-app         # Path of the files in the package (relative to the root of the ZIP) or (S3 directory).
+    destination: /var/www   # Destination path on the servers.
+    overwrite: true         # Overwrites files if they already exist (optional)*.
+  - source: /config         # Another set of files to copy.
+    destination: /etc/my-app/config
+    overwrite: false        # Does not overwrite files if they already exist.
+
+# "permissions" section: Defines file permissions after copying (optional).
+permissions:
+  - object: /var/www/my-app  # Path of the file or directory on the server.
+    pattern: "**"            # Pattern to apply permissions (all files (directories and subdirectories) -> **), (only files on the actual directory -> *). (directory/** -> applies all files and subdirectories on the directory)
+    owner: ec2-user          # Owner of the files.
+    group: ec2-user          # Group of the files.
+    mode: 644                # Permissions in octal format (644 = rw-r--r--).
+    type:
+      - file                 # Applies only to files.
+  - object: /var/www/my-app/scripts
+    pattern: "*.sh"          # Applies only to files with the .sh extension. (also works with specific files ex: run.sh)
+    mode: 755                # Permissions in octal format (755 = rwxr-xr-x).
+    type:
+      - file                 # Applies only to files.
+
+# "hooks" section: Defines scripts or commands to run during different deployment phases.
+hooks:
+  # "BeforeInstall" phase: Runs before copying files.
+  BeforeInstall:
+    - location: scripts/install_dependencies.sh  # Path of the script in the package.
+      timeout: 300                              # Maximum execution time in seconds.
+      runas: root                               # User to run the script as (optional).
+
+  # "AfterInstall" phase: Runs after copying files.
+  AfterInstall:
+    - location: scripts/configure_app.sh        # Script to configure the application.
+      timeout: 300
+      runas: ec2-user
+
+  # "ApplicationStart" phase: Runs after starting the application.
+  ApplicationStart:
+    - location: scripts/start_server.sh         # Script to start the server.
+      timeout: 600                              # Maximum execution time in seconds.
+      runas: ec2-user
+      env:
+        SPRING_PROFILES_ACTIVE: dev  #you can indicate envs here.
+  # "ApplicationStop" phase: Runs before stopping the application (useful for blue/green deployments).
+  ApplicationStop:
+    - location: scripts/stop_server.sh          # Script to stop the server.
+      timeout: 300
+      runas: ec2-user
+
+  # "ValidateService" phase: Runs to verify that the application has been deployed successfully.
+  ValidateService:
+    - location: scripts/verify_deployment.sh    # Script to verify the deployment.
+      timeout: 300
+      runas: ec2-user
+
+# "resources" section: Used for serverless applications (Lambda) (optional).
+resources:
+  - my-lambda-function:                        # Name of the Lambda function.
+    type: AWS::Lambda::Function                # Resource type.
+    properties:
+      Handler: index.handler                   # Entry point of the function.
+      Runtime: nodejs14.x                      # Runtime environment.
+      Code: /my-lambda-code                    # Path of the function code in the package.
+      Timeout: 10                              # Maximum execution time in seconds.
+      MemorySize: 128                          # Memory allocated to the function.
+
+# "checks" section: Defines additional checks (optional).
+checks:
+  - type: "ELB"                                # Type of check (ELB for Elastic Load Balancer).
+    name: "my-app-elb"                         # Name of the load balancer.
+    gracePeriod: 60                            # Wait time before starting the check.
+    interval: 15                               # Interval between checks.
+    healthyThreshold: 3                        # Number of successful checks to consider the application healthy.
+    unhealthyThreshold: 3                      # Number of failed checks to consider the application unhealthy.
