@@ -37,10 +37,10 @@ hooks:
       runas: ec2-user                   # User to run the script as.
 
   # "AfterInstall" phase: Runs after copying files.
-#  AfterInstall:
-#    - location: /home/ec2-user/app/scripts/install_dependencies.sh  # Installs dependencies if needed.
-#      timeout: 300
-#      runas: ec2-user
+  AfterInstall:
+    - location: scripts/fix_permissions.sh  # Nuevo script para asegurarse de que todo esté bien.
+      timeout: 300
+      runas: ec2-user
 
   # "ApplicationStart" phase: Runs after starting the application.
   ApplicationStart:
