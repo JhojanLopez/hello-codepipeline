@@ -40,7 +40,7 @@ hooks:
   AfterInstall:
     - location: scripts/fix_permissions.sh  # Nuevo script para asegurarse de que todo esté bien.
       timeout: 300
-      runas: ec2-user
+      runas: root
 
   # "ApplicationStart" phase: Runs after starting the application.
   ApplicationStart:
