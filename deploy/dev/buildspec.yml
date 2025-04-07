@@ -24,6 +24,8 @@ phases:
       - echo "Build finalizado. Generando artefactos..."
       - cp build/libs/*.jar app.jar
       - echo "Copiando scripts, configuraciones y variables de entorno..."
+      - echo "Contenido en deploy/dev/scripts"
+      - ls -l deploy/dev/scripts
       - cp -r deploy/dev/scripts ./scripts
       - cp -r deploy/dev/config ./config
       - cp -r deploy/dev/envs ./envs
